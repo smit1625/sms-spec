@@ -3,7 +3,6 @@ module Twilio
     class Client < BaseClient
 
       def initialize(*args)
-
         options = args.last.is_a?(Hash) ? args.pop : {}
         options[:host] ||= self.class.host
         @config = Twilio::Util::ClientConfig.new options
@@ -70,7 +69,8 @@ module Twilio
       end
 
       def real_account
-        Twilio::REST::Account.new $account_sid, $access_token
+        @real_accounts = Twilio::REST::Accounts.new "/#{API_VERSION}/Accounts", self
+        @real_account = @real_accounts.get($account_sid)
       end
 
     end

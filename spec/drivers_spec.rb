@@ -50,6 +50,7 @@ describe SmsSpec do
       auth_token = 'yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
 
       @client = Twilio::REST::Client.new account_sid, auth_token
+      expect { @client.real_account }.not_to raise_error
       expect { @client.calls }.not_to raise_error
     end
 
