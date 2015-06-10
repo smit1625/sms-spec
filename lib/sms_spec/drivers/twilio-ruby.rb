@@ -1,14 +1,31 @@
 module Twilio
   module REST
     class Client < BaseClient
-      API_VERSION = '2010-04-01'
-      attr_reader :account, :accounts
-
-      host 'api.twilio.com'
 
       def initialize(*args)
         $account_sid = args[0]
+        $access_token = args[1]
         super(*args)
+      end
+
+      def method_missing(method_name, *args, &block)
+        if account.respond_to?(method_name)
+          account.send(method_name, *args, &block)
+        elsif real_account.respond_to?(method_name)
+          real_account.send(method_name, *args, &block)
+        else
+          super
+        end
+      end
+
+      def respond_to?(method_name, include_private=false)
+        if account.respond_to?(method_name, include_private)
+          true
+        elsif real_account.respond_to?(method_name, include_private)
+          true
+        else
+          super
+        end
       end
 
       class Messages
@@ -38,6 +55,11 @@ module Twilio
         account.class.send(:define_method, :sid, lambda { $account_sid })
         account
       end
+
+      def real_account
+        Twilio::REST::Account.new $account_sid, $access_token
+      end
+
     end
   end
 end

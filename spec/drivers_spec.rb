@@ -45,5 +45,13 @@ describe SmsSpec do
       @client.account.sid.should be(account_sid)
     end
 
+    it 'does not result in calls method undefined' do
+      account_sid = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+      auth_token = 'yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy'
+
+      @client = Twilio::REST::Client.new account_sid, auth_token
+      expect { @client.calls }.not_to raise_error
+    end
+
   end
 end
