@@ -5,7 +5,7 @@ module Twilio
       def initialize(*args)
         $account_sid = args[0]
         $access_token = args[1]
-        super(*args)
+        # super(*args)
       end
 
       def method_missing(method_name, *args, &block)
