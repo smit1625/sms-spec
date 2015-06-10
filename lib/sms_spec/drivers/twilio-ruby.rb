@@ -3,8 +3,21 @@ module Twilio
     class Client < BaseClient
 
       def initialize(*args)
-        $account_sid = args[0]
-        $access_token = args[1]
+
+        options = args.last.is_a?(Hash) ? args.pop : {}
+        options[:host] ||= self.class.host
+        @config = Twilio::Util::ClientConfig.new options
+
+        @account_sid = args[0] || Twilio.account_sid
+        @auth_token = args[1] || Twilio.auth_token
+        if @account_sid.nil? || @auth_token.nil?
+          raise ArgumentError, 'Account SID and auth token are required'
+        end
+        $account_sid = @account_sid
+        $access_token = @auth_token
+
+        set_up_connection
+        set_up_subresources
         # super(*args)
       end
 
