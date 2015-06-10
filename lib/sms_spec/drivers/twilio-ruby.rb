@@ -1,34 +1,43 @@
-class Twilio::REST::Client
+module Twilio
+  module REST
+    class Client < BaseClient
+      API_VERSION = '2010-04-01'
+      attr_reader :account, :accounts
 
-  def initialize(account_sid, auth_token)
-    $account_sid = account_sid
-  end
+      host 'api.twilio.com'
 
-  class Messages
-    include SmsSpec::Helpers
+      def initialize(*args)
+        $account_sid = args[0]
+        super(*args)
+      end
 
-    def create(opts={})
-      to = opts[:to]
-      body = opts[:body]
-      add_message SmsSpec::Message.new(:number => to, :body => body)
+      class Messages
+        include SmsSpec::Helpers
+
+        def create(opts={})
+          to = opts[:to]
+          body = opts[:body]
+          add_message SmsSpec::Message.new(:number => to, :body => body)
+        end
+      end
+
+      class Sms
+        def messages
+          return Messages.new
+        end
+      end
+
+      class Account
+        def sms
+          return Sms.new
+        end
+      end
+
+      def account
+        account = Account.new
+        account.class.send(:define_method, :sid, lambda { $account_sid })
+        account
+      end
     end
-  end
-
-  class Sms
-    def messages
-      return Messages.new
-    end
-  end
-
-  class Account
-    def sms
-      return Sms.new
-    end
-  end
-
-  def account
-    account = Account.new
-    account.class.send(:define_method, :sid, lambda { $account_sid })
-    account
   end
 end
